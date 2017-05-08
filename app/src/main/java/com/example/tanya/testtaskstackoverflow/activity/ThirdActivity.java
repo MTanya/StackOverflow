@@ -3,6 +3,8 @@ package com.example.tanya.testtaskstackoverflow.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.ActionBar;
@@ -17,12 +19,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.example.tanya.testtaskstackoverflow.R;
 import com.example.tanya.testtaskstackoverflow.adapters.BookmarksListAdapter;
 import com.example.tanya.testtaskstackoverflow.models.AnswerStackOverflow;
 import com.example.tanya.testtaskstackoverflow.sqlite.AnswerAdapter;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 /**
@@ -34,6 +38,8 @@ public class ThirdActivity extends AppCompatActivity {
     private ArrayList<AnswerStackOverflow> mAnswers;
     private BookmarksListAdapter bookmarksListAdapter;
     private  TextInputEditText textInputEditText;
+    private Handler mH;
+    private Handler mHUpdate;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -51,9 +57,9 @@ public class ThirdActivity extends AppCompatActivity {
         bookmarksListAdapter = new BookmarksListAdapter(this);
 
         mAnswers = new ArrayList<>();
-        AnswerAdapter answerAdapter = new AnswerAdapter();
-        mAnswers = answerAdapter.getAnswers();
-        bookmarksListAdapter.updateList(mAnswers);
+        mH = new MyHandler(this, false);
+        mHUpdate = new MyHandler(this, true);
+        getAnswers();
 
         RecyclerView searchList = (RecyclerView) findViewById(R.id.rvSearchList);
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
@@ -96,6 +102,7 @@ public class ThirdActivity extends AppCompatActivity {
             }
         });
 
+
     }
 
     @Override
@@ -122,5 +129,78 @@ public class ThirdActivity extends AppCompatActivity {
     private void clearSearch() {
         textInputEditText.getText().clear();
         bookmarksListAdapter.updateList(mAnswers);
+    }
+
+    public void deleteFromBookmarks(final AnswerStackOverflow answer) {
+        if (answer != null) {
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    AnswerAdapter answerAdapter = new AnswerAdapter();
+                    int ans = answerAdapter.deleteAnswer(answer);
+                    mH.sendEmptyMessage(ans);
+                }
+            });
+
+            thread.start();
+        }
+    }
+
+    private void updateList() {
+        bookmarksListAdapter.updateList(mAnswers);
+    }
+
+    private void getAnswers() {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                AnswerAdapter answerAdapter = new AnswerAdapter();
+                mAnswers = answerAdapter.getAnswers();
+                if (mHUpdate != null) mHUpdate.sendEmptyMessage(0);
+            }
+        });
+
+        thread.start();
+    }
+
+    private void showMsg(Message msg) {
+        if (msg.what > 0) {
+            Toast.makeText(this,"Удалено из избранного",Toast.LENGTH_SHORT).show();
+            getAnswers();
+        }
+    }
+
+    private static class MyHandler extends Handler {
+        private WeakReference<ThirdActivity> wrActivity;
+        private boolean mIsUpdate;
+        MyHandler(ThirdActivity activity, boolean isUpdate) {
+            wrActivity = new WeakReference<>(activity);
+            mIsUpdate = isUpdate;
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            ThirdActivity activity = wrActivity.get();
+            if (activity != null) {
+                if (mIsUpdate) {
+                    activity.updateList();
+                } else {
+                    activity.showMsg(msg);
+                }
+            }
+        }
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        if (mH != null) {
+            mH.removeCallbacksAndMessages(null);
+        }
+        if (mHUpdate != null) {
+            mHUpdate.removeCallbacksAndMessages(null);
+        }
+        super.onDestroy();
     }
 }

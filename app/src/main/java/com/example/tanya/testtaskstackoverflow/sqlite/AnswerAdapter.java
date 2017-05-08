@@ -59,8 +59,39 @@ public class AnswerAdapter {
         return answerId;
     }
 
+    public int deleteAnswer(AnswerStackOverflow answer) {
+        int code = 1;
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        String selectQuery =  " DELETE "
+                + " FROM " + Tables.TABLE_ANSWER
+                + " WHERE " + Tables.KEY_AnswerId + " = " + answer.getAnswerId()
+                ;
+        String selectQuery2 = " DELETE "
+                + " FROM " + Tables.TABLE_TAG
+                + " WHERE " + Tables.KEY_AnswerId + " = " + answer.getAnswerId()
+                ;
 
-    public void delete( ) {
+        try {
+            db.beginTransaction();
+            Log.d(TAG, selectQuery);
+            Log.d(TAG, selectQuery2);
+            db.execSQL(selectQuery);
+            db.execSQL(selectQuery2);
+            db.setTransactionSuccessful();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            code = -1;
+        } finally {
+            db.endTransaction();
+        }
+
+        DatabaseManager.getInstance().closeDatabase();
+
+        return code;
+    }
+
+
+    public void deleteTable( ) {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
         db.delete(Tables.TABLE_ANSWER,null,null);
         DatabaseManager.getInstance().closeDatabase();

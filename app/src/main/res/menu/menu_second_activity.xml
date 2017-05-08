@@ -5,6 +5,5 @@
         android:title="В избранное"
         android:icon="@drawable/ic_star"
         app:showAsAction="always">
-
     </item>
 </menu>

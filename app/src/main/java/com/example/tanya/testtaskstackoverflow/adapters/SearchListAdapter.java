@@ -6,8 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.tanya.testtaskstackoverflow.R;
@@ -90,7 +90,7 @@ public class SearchListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         private TextView tvQBody;
         private TextView tvDateUser;
         private TextView tvTags;
-        private LinearLayout llRow;
+        private RelativeLayout llRow;
 
         SearchItemViewHolder(final View itemView) {
             super(itemView);
@@ -100,7 +100,7 @@ public class SearchListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             tvQBody = (TextView) itemView.findViewById(R.id.tvAnswerPreview);
             tvDateUser = (TextView) itemView.findViewById(R.id.tvDateUser);
             tvTags = (TextView) itemView.findViewById(R.id.tvTags);
-            llRow = (LinearLayout) itemView.findViewById(R.id.row);
+            llRow = (RelativeLayout) itemView.findViewById(R.id.row);
 
             llRow.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -112,10 +112,10 @@ public class SearchListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
 
         private void setData(AnswerStackOverflow query) {
-            tvQTitle.setText("Q: " + Html.fromHtml(query.getTitle()).toString());
+            tvQTitle.setText("Q: ".concat(Html.fromHtml(query.getTitle()).toString()));
             String body = Html.fromHtml(query.getBody()).toString();
             tvQBody.setText(body);
-            tvVotesCount.setText(query.getScore()+"");
+            tvVotesCount.setText(String.valueOf(query.getScore()));
 
             StringBuilder tag = new StringBuilder();
             ArrayList<String> tags = query.getTags();

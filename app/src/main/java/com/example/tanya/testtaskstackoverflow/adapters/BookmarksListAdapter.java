@@ -1,13 +1,13 @@
 package com.example.tanya.testtaskstackoverflow.adapters;
 
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.tanya.testtaskstackoverflow.R;
@@ -36,9 +36,10 @@ public class BookmarksListAdapter extends RecyclerView.Adapter<RecyclerView.View
     public void updateList(ArrayList<AnswerStackOverflow> answers) {
         if (answers != null ) {
             mAnswerStackOverflowmms = answers;
-            notifyDataSetChanged();
+        } else {
+            mAnswerStackOverflowmms.clear();
         }
-
+        notifyDataSetChanged();
     }
 
     @Override
@@ -66,7 +67,8 @@ public class BookmarksListAdapter extends RecyclerView.Adapter<RecyclerView.View
         private TextView tvQBody;
         private TextView tvDateUser;
         private TextView tvTags;
-        private LinearLayout llRow;
+        private RelativeLayout llRow;
+        private Toolbar toolbar;
 
         BookmarksItemViewHolder(final View itemView) {
             super(itemView);
@@ -76,7 +78,20 @@ public class BookmarksListAdapter extends RecyclerView.Adapter<RecyclerView.View
             tvQBody = (TextView) itemView.findViewById(R.id.tvAnswerPreview);
             tvDateUser = (TextView) itemView.findViewById(R.id.tvDateUser);
             tvTags = (TextView) itemView.findViewById(R.id.tvTags);
-            llRow = (LinearLayout) itemView.findViewById(R.id.row);
+            llRow = (RelativeLayout) itemView.findViewById(R.id.row);
+            toolbar = (Toolbar) itemView.findViewById(R.id.toolbar);
+            toolbar.setVisibility(View.VISIBLE);
+            toolbar.inflateMenu(R.menu.menu_bookmark);
+            toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    if (item.getItemId() == R.id.del_bookmark) {
+                        int pos = getAdapterPosition();
+                        mActivity.deleteFromBookmarks(mAnswerStackOverflowmms.get(pos));
+                    }
+                    return true;
+                }
+            });
 
             llRow.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -88,10 +103,10 @@ public class BookmarksListAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
 
         private void setData(AnswerStackOverflow query) {
-            tvQTitle.setText("Q: " + Html.fromHtml(query.getTitle()).toString());
+            tvQTitle.setText("Q: ".concat(Html.fromHtml(query.getTitle()).toString()));
             String body = Html.fromHtml(query.getBody()).toString();
             tvQBody.setText(body);
-            tvVotesCount.setText(query.getScore()+"");
+            tvVotesCount.setText(String.valueOf(query.getScore()));
 
             StringBuilder tag = new StringBuilder();
             ArrayList<String> tags = query.getTags();

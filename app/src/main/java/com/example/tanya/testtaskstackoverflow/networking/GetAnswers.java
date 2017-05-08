@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.example.tanya.testtaskstackoverflow.activity.FirstActivity;
 import com.example.tanya.testtaskstackoverflow.models.AnswerByApi;
@@ -15,18 +16,20 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Created by Tanya on 07.05.2017.
  */
 
-public class GetAnswers extends AsyncTask<String, Void, AnswerByApi> {
+public class GetAnswers extends AsyncTask<String, Void, Object[]> {
 
     private static final String TAG = GetAnswers.class.getSimpleName();
     private FirstActivity mActivity;
@@ -45,21 +48,23 @@ public class GetAnswers extends AsyncTask<String, Void, AnswerByApi> {
     }
 
     @Override
-    protected AnswerByApi doInBackground(String... params) {
+    protected Object[] doInBackground(String... params) {
         String searchText = params[0];
         String urlStr = "https://api.stackexchange.com/2.2/answers?order=desc&sort=votes&q="
                 +searchText+"&site=stackoverflow&page="+mActivity.mPage+"&pagesize=30&filter=!b0OfNb36brYWw1";
 
         String responseStr = "";
-
+        String error = "";
+        int responseCode = 0;
+        HttpURLConnection connection = null;
         try {
             URL url = new URL(urlStr);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 
             Log.d(TAG, "doInBackground: " + url);
 
-            int responseCode = connection.getResponseCode();
+            responseCode = connection.getResponseCode();
             BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String inputLine;
             StringBuilder response = new StringBuilder();
@@ -70,8 +75,17 @@ public class GetAnswers extends AsyncTask<String, Void, AnswerByApi> {
             in.close();
         } catch (MalformedURLException e) {
             e.printStackTrace();
+            error = "Не удалось получить доступ к сайту.";
+        } catch (FileNotFoundException fne){
+            fne.printStackTrace();
+           error = "Пожалуйста, попробуйте позднее.";
         } catch (IOException e) {
             e.printStackTrace();
+            error = e.getMessage();
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
         }
 
         AnswerByApi answerByApi = new AnswerByApi();
@@ -126,14 +140,34 @@ public class GetAnswers extends AsyncTask<String, Void, AnswerByApi> {
             e.printStackTrace();
         }
 
-        return answerByApi;
+        return new Object[] {responseCode, error, answerByApi};
     }
 
     @Override
-    protected void onPostExecute(AnswerByApi answerByApi) {
+    protected void onPostExecute(Object[] response) {
         mProgressBar.setVisibility(View.GONE);
         if (mMoreButton != null) mMoreButton.setVisibility(View.VISIBLE);
-        mActivity.updateList(answerByApi);
+        if ((int)response[0] == 200) {
+            AnswerByApi answerByApi = (AnswerByApi) response[2];
+            mActivity.updateList(answerByApi);
+        } else {
+            Toast.makeText(mActivity, (String)response[1], Toast.LENGTH_SHORT).show();
+        }
 
+        /*
+        на случай когда api говорит - слишком много запросов от ip
+
+        AnswerByApi answerByApi = new AnswerByApi();
+        ArrayList<AnswerStackOverflow> answer = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            AnswerStackOverflow answerStackOverflow = new AnswerStackOverflow();
+            answerStackOverflow.setTitle(i+"");
+            answerStackOverflow.setAnswerId(i);
+            answer.add(answerStackOverflow);
+        }
+
+        answerByApi.setQueries(answer);
+        mActivity.updateList(answerByApi);
+        */
     }
 }
