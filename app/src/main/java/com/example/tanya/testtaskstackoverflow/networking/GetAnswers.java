@@ -19,11 +19,15 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Objects;
+
+import static java.net.Proxy.Type.HTTP;
 
 /**
  * Created by Tanya on 07.05.2017.
@@ -50,6 +54,13 @@ public class GetAnswers extends AsyncTask<String, Void, Object[]> {
     @Override
     protected Object[] doInBackground(String... params) {
         String searchText = params[0];
+        if (searchText != null) {
+            try {
+                searchText = URLEncoder.encode(searchText,"UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
         String urlStr = "https://api.stackexchange.com/2.2/answers?order=desc&sort=votes&q="
                 +searchText+"&site=stackoverflow&page="+mActivity.mPage+"&pagesize=30&filter=!b0OfNb36brYWw1";
 
