@@ -46,9 +46,9 @@ public class GetAnswers extends AsyncTask<String, Void, AnswerByApi> {
 
     @Override
     protected AnswerByApi doInBackground(String... params) {
-        String serachText = params[0];
+        String searchText = params[0];
         String urlStr = "https://api.stackexchange.com/2.2/answers?order=desc&sort=votes&q="
-                +serachText+"&site=stackoverflow&page="+mActivity.mPage+"&pagesize=30&filter=!b0OfNb36brYWw1";
+                +searchText+"&site=stackoverflow&page="+mActivity.mPage+"&pagesize=30&filter=!b0OfNb36brYWw1";
 
         String responseStr = "";
 
@@ -62,7 +62,7 @@ public class GetAnswers extends AsyncTask<String, Void, AnswerByApi> {
             int responseCode = connection.getResponseCode();
             BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String inputLine;
-            StringBuffer response = new StringBuffer();
+            StringBuilder response = new StringBuilder();
             while ((inputLine = in.readLine()) != null) {
                 response.append(inputLine);
             }

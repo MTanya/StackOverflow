@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
@@ -27,6 +29,7 @@ import com.example.tanya.testtaskstackoverflow.models.AnswerStackOverflow;
 import com.example.tanya.testtaskstackoverflow.networking.GetAnswers;
 import com.example.tanya.testtaskstackoverflow.sqlite.AnswerAdapter;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 /**
@@ -45,12 +48,12 @@ public class FirstActivity extends AppCompatActivity {
     private TextInputEditText searchText;
     public LinearLayoutManager mLayoutManager;
     private TextView tvCountBookmarks;
+    private Handler mH;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first);
-
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -87,6 +90,8 @@ public class FirstActivity extends AppCompatActivity {
         });
 
         tvCountBookmarks = (TextView) findViewById(R.id.countBookmarks);
+
+        mH = new MyHandler(mActivity);
 
     }
 
@@ -125,18 +130,53 @@ public class FirstActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        getCountAnswers();
+    }
 
-        AnswerAdapter answerAdapter = new AnswerAdapter();
-        int cc = answerAdapter.getCountAnswers();
+    private void updateCounter(int cc) {
         tvCountBookmarks.setText("(" + cc +")");
+    }
+
+    private void getCountAnswers() {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                AnswerAdapter answerAdapter = new AnswerAdapter();
+                int cc = answerAdapter.getCountAnswers();
+                mH.sendEmptyMessage(cc);
+            }
+        });
+
+        thread.start();
     }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         if (mQuerySearch != null && !mQuerySearch.isCancelled()) {
             mQuerySearch.cancel(false);
             mQuerySearch = null;
+        }
+        if (mH != null) {
+            mH.removeCallbacksAndMessages(null);
+        }
+        super.onDestroy();
+    }
+
+    private static class MyHandler extends Handler {
+
+        private WeakReference<FirstActivity> wrActivity;
+
+        MyHandler(FirstActivity activity) {
+            wrActivity = new WeakReference<>(activity);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            FirstActivity firstActivity = wrActivity.get();
+            if (firstActivity != null) {
+                firstActivity.updateCounter(msg.what);
+            }
         }
     }
 }
