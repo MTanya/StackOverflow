@@ -49,8 +49,10 @@ public class AnswerAdapter {
         // Inserting Row
         answerId=(int)db.insert(Tables.TABLE_ANSWER, null, values);
 
-        TagAdapter tagAdapter = new TagAdapter();
-        tagAdapter.insert(db, answer.getAnswerId(), answer.getTags());
+        if (answerId > 0) {
+            TagAdapter tagAdapter = new TagAdapter();
+            tagAdapter.insert(db, answer.getAnswerId(), answer.getTags());
+        }
 
         DatabaseManager.getInstance().closeDatabase();
 
