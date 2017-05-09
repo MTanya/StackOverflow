@@ -11,6 +11,8 @@ import java.util.ArrayList;
 
 /**
  * Created by Tanya on 07.05.2017.
+ * Класс для работы с таблицей Answer в БД
+ * CRUD операции
  */
 
 public class AnswerAdapter {
@@ -46,7 +48,6 @@ public class AnswerAdapter {
         values.put(Tables.KEY_Body, answer.getBody());
         values.put(Tables.KEY_DisplayNameUser, answer.getDisplayNameUser());
 
-        // Inserting Row
         answerId=(int)db.insert(Tables.TABLE_ANSWER, null, values);
 
         if (answerId > 0) {
@@ -101,13 +102,13 @@ public class AnswerAdapter {
         int count = 0;
 
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
-        String selectQuery =  " SELECT COUNT(*)"
-                + " FROM " + Tables.TABLE_ANSWER
-                ;
-
+        String query = "COUNT("+ Tables.KEY_AnswerId +") AS counter";
         Cursor cursor = db.query(Tables.TABLE_ANSWER,
-                new String[] {"COUNT("+ Tables.KEY_AnswerId +") AS counter"},
+                new String[] {query},
                 null, null, null, null, null);
+
+        Log.d(TAG, query);
+
         if (cursor.moveToFirst()) {
             do {
                 count = cursor.getInt(cursor.getColumnIndex("counter"));

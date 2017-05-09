@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 /**
  * Created by Tanya on 08.05.2017.
+ * Класс управляет подключением к БД
  */
 
 public class DatabaseManager {

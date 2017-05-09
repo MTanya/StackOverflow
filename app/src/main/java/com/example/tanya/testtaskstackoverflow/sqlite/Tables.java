@@ -2,6 +2,7 @@ package com.example.tanya.testtaskstackoverflow.sqlite;
 
 /**
  * Created by Tanya on 07.05.2017.
+ * Класс с описаниями таблиц
  */
 
 class Tables {

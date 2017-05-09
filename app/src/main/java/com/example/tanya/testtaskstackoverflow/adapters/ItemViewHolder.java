@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.text.Spanned;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -35,11 +36,11 @@ class ItemViewHolder extends RecyclerView.ViewHolder {
     private Activity mActivity;
     private FirstActivity firstActivity;
     private ThirdActivity thirdActivity;
+    private ArrayList<AnswerStackOverflow> mAnswers;
 
     private SimpleDateFormat sdf;
 
-    ItemViewHolder(View itemView, boolean isToolbar, Activity activity,
-                   final ArrayList<AnswerStackOverflow> answerStackOverflows) {
+    ItemViewHolder(View itemView, boolean isToolbar, Activity activity) {
         super(itemView);
 
         sdf = new SimpleDateFormat("MMM dd", Locale.US);
@@ -66,7 +67,8 @@ class ItemViewHolder extends RecyclerView.ViewHolder {
                     if (item.getItemId() == R.id.del_bookmark) {
                         int pos = getAdapterPosition();
                         if (thirdActivity != null) {
-                            thirdActivity.deleteFromBookmarks(answerStackOverflows.get(pos));
+                            mAnswers = thirdActivity.getAnswers();
+                            thirdActivity.deleteFromBookmarks(mAnswers.get(pos));
                         }
                     }
                     return true;
@@ -79,9 +81,11 @@ class ItemViewHolder extends RecyclerView.ViewHolder {
             public void onClick(View v) {
                 int pos = getAdapterPosition();
                 if (thirdActivity != null) {
-                    thirdActivity.goToAnswer(answerStackOverflows.get(pos));
+                    mAnswers = thirdActivity.getAnswers();
+                    thirdActivity.goToAnswer(mAnswers.get(pos));
                 } else if (firstActivity != null) {
-                    firstActivity.goToAnswer(answerStackOverflows.get(pos));
+                    mAnswers = firstActivity.getAnswers();
+                    firstActivity.goToAnswer(mAnswers.get(pos));
                 }
             }
         });
@@ -96,12 +100,12 @@ class ItemViewHolder extends RecyclerView.ViewHolder {
     }
 
     private void setTitle(String queryTitle) {
-        String title = String.format(mActivity.getString(R.string.title_Q), Html.fromHtml(queryTitle).toString());
+        String title = String.format(mActivity.getString(R.string.title_Q), stringFromHtml(queryTitle).toString());
         tvQTitle.setText(title);
     }
 
     private void setBody(String body) {
-        tvQBody.setText(Html.fromHtml(body).toString());
+        tvQBody.setText(stringFromHtml(body).toString());
     }
 
     private void setVotesCount(String votesCount) {
@@ -124,5 +128,17 @@ class ItemViewHolder extends RecyclerView.ViewHolder {
         String askedUser = String.format(mActivity.getString(R.string.asked_by_user),
                 sdf.format(calendar.getTime()), displayNameUSer);
         tvDateUser.setText(askedUser);
+    }
+
+    @SuppressWarnings("deprecation")
+    private Spanned stringFromHtml(String text) {
+        Spanned result;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            result = Html.fromHtml(text,Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            result = Html.fromHtml(text);
+        }
+
+        return result;
     }
 }

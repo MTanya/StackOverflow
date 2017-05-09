@@ -22,37 +22,55 @@ import java.lang.ref.WeakReference;
 
 /**
  * Created by Tanya on 07.05.2017.
+ * 2 экран - выбранный Ответ из списка ответов с первого экрана
  */
 
 public class SecondActivity extends AppCompatActivity {
 
     private AnswerStackOverflow mAnswer;
-    private Handler mH;
     private SecondActivity mActivity;
+
+    private Handler mH;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_second);
 
+        initFields();
+        initViews();
+        initHandlers();
+    }
+
+    private void initFields() {
         mActivity = this;
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDefaultDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-
-        WebView webView = (WebView) findViewById(R.id.webView);
-        webView.setWebChromeClient(new WebChromeClient());
 
         AnswerStackOverflow answer = (AnswerStackOverflow) getIntent().getSerializableExtra("Answer");
         if (answer != null) {
             mAnswer = answer;
-            String link = answer.getLink();
-            webView.loadUrl(link);
         }
+    }
 
+    private void initViews() {
+        initToolbar();
+
+        WebView webView = (WebView) findViewById(R.id.webView);
+        webView.setWebChromeClient(new WebChromeClient());
+        String link = mAnswer.getLink();
+        webView.loadUrl(link);
+    }
+
+    private void initToolbar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDefaultDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    private void initHandlers() {
         mH = new MyHandler(mActivity);
     }
 
@@ -69,10 +87,10 @@ public class SecondActivity extends AppCompatActivity {
 
     private void showMsg(Message msg) {
         if (msg.what > 0) {
-            Toast.makeText(mActivity,"Добавлено в избранное",Toast.LENGTH_SHORT).show();
+            Toast.makeText(mActivity,getString(R.string.add_bm),Toast.LENGTH_SHORT).show();
             finish();
         } else {
-            Toast.makeText(mActivity,"Уже в избранном",Toast.LENGTH_SHORT).show();
+            Toast.makeText(mActivity,getString(R.string.exist_bm),Toast.LENGTH_SHORT).show();
         }
     }
 

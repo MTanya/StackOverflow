@@ -9,6 +9,11 @@
     <string name="desc_img_star">Избранное</string>
     <string name="desc_btn_clear">Очистить</string>
 
+    <!--Toasts-->
+    <string name="add_bm">Добавлено в избранное</string>
+    <string name="exist_bm">Уже в избранном</string>
+    <string name="remove_bm">Удалено из избранного</string>
+
     <!--more_item-->
     <string name="btn_more">Загрузить еще</string>
 
@@ -17,4 +22,8 @@
     <string name="asked_by_user">asked %1$s by %2$s</string>
     <string name="tags">Tags:</string>
     <string name="title_Q">Q: %1$s</string>
+
+    <!--menu-->
+    <string name="action_delete_bm">Удалить</string>
+    <string name="action_add_bm">В избранное</string>
 </resources>

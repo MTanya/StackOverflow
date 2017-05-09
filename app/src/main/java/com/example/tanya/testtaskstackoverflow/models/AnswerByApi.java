@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 /**
  * Created by Tanya on 07.05.2017.
+ * Модель Ответ от сервера stackoverflow.com
  */
 
 public class AnswerByApi {

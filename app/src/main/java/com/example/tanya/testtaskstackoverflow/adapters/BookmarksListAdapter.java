@@ -37,7 +37,7 @@ public class BookmarksListAdapter extends RecyclerView.Adapter<RecyclerView.View
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new ItemViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.search_item, parent, false),
-                true, mActivity, mAnswerStackOverflows);
+                true, mActivity);
     }
 
     @Override

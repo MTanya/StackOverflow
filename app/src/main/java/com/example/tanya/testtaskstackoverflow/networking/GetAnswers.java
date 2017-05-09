@@ -25,12 +25,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Objects;
-
-import static java.net.Proxy.Type.HTTP;
 
 /**
  * Created by Tanya on 07.05.2017.
+ * Поисковый запрос на сайт stackoverflow.com
  */
 
 public class GetAnswers extends AsyncTask<String, Void, Object[]> {
@@ -54,6 +52,18 @@ public class GetAnswers extends AsyncTask<String, Void, Object[]> {
     @Override
     protected Object[] doInBackground(String... params) {
         String searchText = params[0];
+        Object[] response = sendGetQuery(searchText);
+
+        String responseStr = (String) response[2];
+        String error = (String) response[1];
+        int responseCode = (int) response[0];
+
+        AnswerByApi answerByApi = parseResponse(responseStr);
+
+        return new Object[] {responseCode, error, answerByApi};
+    }
+
+    private Object[] sendGetQuery(String searchText) {
         if (searchText != null) {
             try {
                 searchText = URLEncoder.encode(searchText,"UTF-8");
@@ -89,7 +99,7 @@ public class GetAnswers extends AsyncTask<String, Void, Object[]> {
             error = "Не удалось получить доступ к сайту.";
         } catch (FileNotFoundException fne){
             fne.printStackTrace();
-           error = "Пожалуйста, попробуйте позднее.";
+            error = "Пожалуйста, попробуйте позднее.";
         } catch (IOException e) {
             e.printStackTrace();
             error = e.getMessage();
@@ -99,10 +109,14 @@ public class GetAnswers extends AsyncTask<String, Void, Object[]> {
             }
         }
 
+        return new Object[] {responseCode, error, responseStr};
+    }
+
+    private AnswerByApi parseResponse(String response) {
         AnswerByApi answerByApi = new AnswerByApi();
 
         try {
-            JSONObject jsonArray = new JSONObject(responseStr);
+            JSONObject jsonArray = new JSONObject(response);
             ArrayList<AnswerStackOverflow> answerStackOverflows = new ArrayList<>();
 
             try {
@@ -151,7 +165,7 @@ public class GetAnswers extends AsyncTask<String, Void, Object[]> {
             e.printStackTrace();
         }
 
-        return new Object[] {responseCode, error, answerByApi};
+        return answerByApi;
     }
 
     @Override

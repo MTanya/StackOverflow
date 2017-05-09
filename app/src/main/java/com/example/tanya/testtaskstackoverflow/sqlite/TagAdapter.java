@@ -10,13 +10,15 @@ import java.util.ArrayList;
 
 /**
  * Created by Tanya on 07.05.2017.
+ * Класс для работы с таблицей Tag
+ * CRUD операции
  */
 
-public class TagAdapter {
+class TagAdapter {
 
     private static final String TAG = TagAdapter.class.getSimpleName();
 
-    public static String createTable() {
+    static String createTable() {
         return "CREATE TABLE " + Tables.TABLE_TAG  + "("
                 + Tables.KEY_TagId  + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
                 + Tables.KEY_AnswerId + " INTEGER, "
@@ -24,7 +26,7 @@ public class TagAdapter {
                 +" )";
     }
 
-    public int insert(SQLiteDatabase db, long answerId, ArrayList<String> tags) {
+    int insert(SQLiteDatabase db, long answerId, ArrayList<String> tags) {
 
         int tagId = 0;
         for (String tag : tags) {
@@ -44,7 +46,7 @@ public class TagAdapter {
         DatabaseManager.getInstance().closeDatabase();
     }
 
-    public ArrayList<String> getTags(long answerId) {
+    ArrayList<String> getTags(long answerId) {
         ArrayList<String> tags = new ArrayList<>();
 
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();

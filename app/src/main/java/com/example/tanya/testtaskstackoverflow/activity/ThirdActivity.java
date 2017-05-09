@@ -31,13 +31,16 @@ import java.util.ArrayList;
 
 /**
  * Created by Tanya on 07.05.2017.
+ * 3 экран список закладок
  */
 
 public class ThirdActivity extends AppCompatActivity {
 
     private ArrayList<AnswerStackOverflow> mAnswers;
     private BookmarksListAdapter bookmarksListAdapter;
-    private  TextInputEditText textInputEditText;
+
+    private TextInputEditText textInputEditText;
+
     private Handler mH;
     private Handler mHUpdate;
 
@@ -46,27 +49,21 @@ public class ThirdActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_third);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDefaultDisplayHomeAsUpEnabled(true);
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
+        initFields();
+        initViews();
+        initHandlers();
 
+        getAnswersFromDb();
+    }
+
+    private void initFields() {
         bookmarksListAdapter = new BookmarksListAdapter(this);
-
         mAnswers = new ArrayList<>();
-        mH = new MyHandler(this, false);
-        mHUpdate = new MyHandler(this, true);
-        getAnswers();
+    }
 
-        RecyclerView searchList = (RecyclerView) findViewById(R.id.rvSearchList);
-        LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
-        searchList.setLayoutManager(mLayoutManager);
-        searchList.setAdapter(bookmarksListAdapter);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(this, mLayoutManager.getOrientation());
-        searchList.addItemDecoration(dividerItemDecoration);
+    private void initViews() {
+        initToolbar();
+        initBookmarksList();
 
         textInputEditText = (TextInputEditText) findViewById(R.id.tilSearchText);
         textInputEditText.addTextChangedListener(new TextWatcher() {
@@ -90,19 +87,44 @@ public class ThirdActivity extends AppCompatActivity {
 
             }
         });
-
         ImageButton btnClear = (ImageButton) findViewById(R.id.btnClear);
         btnClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 clearSearch();
                 textInputEditText.clearFocus();
-                InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                hideKeyBoard(v);
             }
         });
+    }
 
+    private void hideKeyBoard(View v) {
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+    }
 
+    private void initToolbar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDefaultDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    private void initBookmarksList() {
+        RecyclerView searchList = (RecyclerView) findViewById(R.id.rvSearchList);
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
+        searchList.setLayoutManager(mLayoutManager);
+        searchList.setAdapter(bookmarksListAdapter);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(this, mLayoutManager.getOrientation());
+        searchList.addItemDecoration(dividerItemDecoration);
+    }
+
+    private void initHandlers() {
+        mH = new MyHandler(this, false);
+        mHUpdate = new MyHandler(this, true);
     }
 
     @Override
@@ -138,6 +160,7 @@ public class ThirdActivity extends AppCompatActivity {
                 public void run() {
                     AnswerAdapter answerAdapter = new AnswerAdapter();
                     int ans = answerAdapter.deleteAnswer(answer);
+                    mAnswers = answerAdapter.getAnswers();
                     mH.sendEmptyMessage(ans);
                 }
             });
@@ -146,11 +169,11 @@ public class ThirdActivity extends AppCompatActivity {
         }
     }
 
-    private void updateList() {
+    public void updateList() {
         bookmarksListAdapter.updateList(mAnswers);
     }
 
-    private void getAnswers() {
+    private void getAnswersFromDb() {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -163,10 +186,13 @@ public class ThirdActivity extends AppCompatActivity {
         thread.start();
     }
 
+    public ArrayList<AnswerStackOverflow> getAnswers() {
+        return mAnswers;
+    }
+
     private void showMsg(Message msg) {
         if (msg.what > 0) {
-            Toast.makeText(this,"Удалено из избранного",Toast.LENGTH_SHORT).show();
-            getAnswers();
+            Toast.makeText(this,getString(R.string.remove_bm),Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -187,6 +213,7 @@ public class ThirdActivity extends AppCompatActivity {
                     activity.updateList();
                 } else {
                     activity.showMsg(msg);
+                    activity.updateList();
                 }
             }
         }

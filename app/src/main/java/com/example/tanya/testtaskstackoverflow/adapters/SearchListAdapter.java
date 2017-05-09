@@ -53,7 +53,7 @@ public class SearchListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             return new MoreViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.more_item, parent, false));
         } else {
             return new ItemViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.search_item, parent, false),
-                    false, mActivity, mAnswerStackOverflows);
+                    false, mActivity);
         }
     }
 
@@ -97,5 +97,9 @@ public class SearchListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 }
             });
         }
+    }
+
+    public ArrayList<AnswerStackOverflow> getAnswers() {
+        return mAnswerStackOverflows;
     }
 }

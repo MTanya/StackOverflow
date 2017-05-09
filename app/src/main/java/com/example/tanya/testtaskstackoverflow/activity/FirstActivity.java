@@ -13,7 +13,6 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -34,41 +33,53 @@ import java.util.ArrayList;
 
 /**
  * Created by Tanya on 07.05.2017.
+ * 1 экран
+ * Список ответов с сайта stackoverflow.com по запросу из строки Поиск
  */
 
 public class FirstActivity extends AppCompatActivity {
 
-    private static final String TAG = FirstActivity.class.getSimpleName();
-
     private AsyncTask mQuerySearch;
     private SearchListAdapter mAdapter;
-    public ProgressBar mProgressBar;
-    public int mPage = 1;
+    private Handler mH;
+
     private FirstActivity mActivity;
     private TextInputEditText searchText;
     public LinearLayoutManager mLayoutManager;
     private TextView tvCountBookmarks;
-    private Handler mH;
+    public ProgressBar mProgressBar;
+
+    public int mPage;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first);
 
+        initFields();
+        initViews();
+        initHandlers();
+
+        getData(mProgressBar,null);
+    }
+
+    private void initToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+    }
 
+    private void initFields() {
         mActivity = this;
+        mPage = 1;
+    }
+
+    private void initViews() {
+        initToolbar();
+
         searchText = (TextInputEditText) findViewById(R.id.tilSearchText);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
 
-        RecyclerView searchList = (RecyclerView) findViewById(R.id.rvSearchList);
-        mLayoutManager = new LinearLayoutManager(mActivity);
-        searchList.setLayoutManager(mLayoutManager);
-        mAdapter = new SearchListAdapter(mActivity);
-        searchList.setAdapter(mAdapter);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mActivity, mLayoutManager.getOrientation());
-        searchList.addItemDecoration(dividerItemDecoration);
+        initSearchList();
 
         ImageButton imageButton = (ImageButton) findViewById(R.id.btnSearch);
         imageButton.setOnClickListener(new View.OnClickListener() {
@@ -76,8 +87,7 @@ public class FirstActivity extends AppCompatActivity {
             public void onClick(View v) {
                 mPage = 1;
                 getData(mProgressBar,null);
-                InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                hideKeyboard(v);
             }
         });
 
@@ -90,9 +100,25 @@ public class FirstActivity extends AppCompatActivity {
         });
 
         tvCountBookmarks = (TextView) findViewById(R.id.countBookmarks);
+    }
 
+    private void hideKeyboard(View v) {
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+    }
+
+    private void initSearchList() {
+        RecyclerView searchList = (RecyclerView) findViewById(R.id.rvSearchList);
+        mLayoutManager = new LinearLayoutManager(mActivity);
+        searchList.setLayoutManager(mLayoutManager);
+        mAdapter = new SearchListAdapter(mActivity);
+        searchList.setAdapter(mAdapter);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mActivity, mLayoutManager.getOrientation());
+        searchList.addItemDecoration(dividerItemDecoration);
+    }
+
+    private void initHandlers() {
         mH = new MyHandler(mActivity);
-
     }
 
     public void updateList(AnswerByApi answerByApi) {
@@ -101,7 +127,7 @@ public class FirstActivity extends AppCompatActivity {
     }
 
     public void getData(ProgressBar progressBar, Button moreButton) {
-        mQuerySearch = new GetAnswers(mActivity,progressBar,moreButton).execute(searchText.getText().toString());
+        mQuerySearch = new GetAnswers(mActivity, progressBar, moreButton).execute(searchText.getText().toString());
     }
 
     public void goToAnswer(AnswerStackOverflow answer) {
@@ -148,6 +174,10 @@ public class FirstActivity extends AppCompatActivity {
         });
 
         thread.start();
+    }
+
+    public ArrayList<AnswerStackOverflow> getAnswers() {
+        return mAdapter.getAnswers();
     }
 
     @Override

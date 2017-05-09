@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 /**
  * Created by Tanya on 07.05.2017.
+ * Модель - Ответ на вопрос заданный в поисковой строке найденный на сайте stackoverflow.com
  */
 
 public class AnswerStackOverflow implements Serializable{
