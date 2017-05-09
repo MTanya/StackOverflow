@@ -180,7 +180,7 @@ public class GetAnswers extends AsyncTask<String, Void, Object[]> {
         }
 
         /*
-        на случай когда api говорит - слишком много запросов от ip
+        на случай тестирования когда api говорит - слишком много запросов от ip
 
         AnswerByApi answerByApi = new AnswerByApi();
         ArrayList<AnswerStackOverflow> answer = new ArrayList<>();

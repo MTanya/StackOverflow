@@ -23,31 +23,31 @@ public class AnswerByApi {
         return mQueries;
     }
 
-    public void setQueries(ArrayList<AnswerStackOverflow> mQuery) {
-        this.mQueries = mQuery;
+    public void setQueries(ArrayList<AnswerStackOverflow> query) {
+        mQueries = query;
     }
 
     public boolean isHasMore() {
         return mIsHasMore;
     }
 
-    public void setHasMore(boolean mIsHasMore) {
-        this.mIsHasMore = mIsHasMore;
+    public void setHasMore(boolean isHasMore) {
+        mIsHasMore = isHasMore;
     }
 
     public int getQuotaMax() {
         return mQuotaMax;
     }
 
-    public void setQuotaMax(int mQuotaMax) {
-        this.mQuotaMax = mQuotaMax;
+    public void setQuotaMax(int quotaMax) {
+        mQuotaMax = quotaMax;
     }
 
-    public int getmQuotaRemaining() {
+    public int getQuotaRemaining() {
         return mQuotaRemaining;
     }
 
-    public void setQuotaRemaining(int mQuotaRemaining) {
-        this.mQuotaRemaining = mQuotaRemaining;
+    public void setQuotaRemaining(int quotaRemaining) {
+        mQuotaRemaining = quotaRemaining;
     }
 }

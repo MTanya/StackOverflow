@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 
 public class DatabaseManager {
-    private Integer mOpenCounter = 0;
+    private int mOpenCounter = 0;
 
     private static DatabaseManager instance;
     private static SQLiteOpenHelper mDatabaseHelper;

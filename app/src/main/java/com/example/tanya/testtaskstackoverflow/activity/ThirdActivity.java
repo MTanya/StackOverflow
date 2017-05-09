@@ -115,10 +115,10 @@ public class ThirdActivity extends AppCompatActivity {
 
     private void initBookmarksList() {
         RecyclerView searchList = (RecyclerView) findViewById(R.id.rvSearchList);
-        LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
-        searchList.setLayoutManager(mLayoutManager);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        searchList.setLayoutManager(linearLayoutManager);
         searchList.setAdapter(bookmarksListAdapter);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(this, mLayoutManager.getOrientation());
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(this, linearLayoutManager.getOrientation());
         searchList.addItemDecoration(dividerItemDecoration);
     }
 

@@ -81,8 +81,8 @@ public class FirstActivity extends AppCompatActivity {
 
         initSearchList();
 
-        ImageButton imageButton = (ImageButton) findViewById(R.id.btnSearch);
-        imageButton.setOnClickListener(new View.OnClickListener() {
+        ImageButton btnSearch = (ImageButton) findViewById(R.id.btnSearch);
+        btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mPage = 1;

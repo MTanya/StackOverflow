@@ -1,7 +1,6 @@
 package com.example.tanya.testtaskstackoverflow.sigleton;
 
 import android.app.Application;
-import android.content.Context;
 
 import com.example.tanya.testtaskstackoverflow.sqlite.DatabaseManager;
 import com.example.tanya.testtaskstackoverflow.sqlite.DbHelper;
